@@ -252,8 +252,12 @@ function runGame() {
     const actions = state.pendingActions || 0;
     state.pendingActions = 0;
     if (screen === 'play') {
+      // One-shot actions (enter a car, reload, melee) run on the first step of the frame only:
+      // passing them to every catch-up step would toggle them several times per press.
+      let firstStep = true;
       while (accumulator >= STEP) {
-        stepGame(state, STEP, input, actions);
+        stepGame(state, STEP, input, firstStep ? actions : 0);
+        firstStep = false;
         accumulator -= STEP;
         if (state.screen === 'over') {
           screen = 'over';
